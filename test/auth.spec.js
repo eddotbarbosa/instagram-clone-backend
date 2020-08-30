@@ -1,0 +1,68 @@
+const chai = require('chai');
+const request = require('supertest');
+
+const server = require('../src/server.js');
+
+const assert = chai.assert;
+
+setTimeout(function () {
+  describe('authentication tests', () => {
+    let token;
+
+    before(async () => {
+      await request(server)
+        .post('/users')
+        .send({
+          name: 'auth user',
+          username: 'authuser',
+          email: 'authuser@email.com',
+          password: 'authuserkey',
+          phone: '',
+          avatar: '/img/default-avatar.png',
+          biography: '',
+          externalUrl: '',
+          gender: 'not informed',
+          posts: [],
+          followers: [],
+          following: []
+        });
+
+      const signIn = await request(server)
+        .post('/auth/signin')
+        .send({
+          email: 'authuser@email.com',
+          password: 'authuserkey'
+        });
+
+      token = signIn.body.token;
+    });
+
+    after(async() => {
+      await request(server)
+        .del('/users')
+        .set('Authorization', token);
+    });
+
+    describe('sign in and sign out', () => {
+      it('should sign in user when all fields are corrects', async () => {
+        const signIn = await request(server)
+          .post('/auth/signin')
+          .send({
+            email: 'authuser@email.com',
+            password: 'authuserkey'
+          });
+
+        assert.exists(signIn.body.token);
+      });
+
+      it('should sign out user when all fields are corrects', async () => {
+        const signOut = await request(server)
+          .post('/auth/signout')
+          .set('Authorization', token);
+
+        assert.equal(signOut.body.result, 'user successfully signed out!');
+      });
+    });
+  });
+  run()
+}, 2500);
