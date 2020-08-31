@@ -63,6 +63,21 @@ setTimeout(function () {
         assert.equal(signOut.body.result, 'user successfully signed out!');
       });
     });
+
+    describe('change password', () => {
+      it('should change password when all fields are corrects', async () => {
+        const changePassword = await request(server)
+          .post('/auth/change-password')
+          .set('Authorization', token)
+          .send({
+            currentPassword: 'authuserkey',
+            newPassword: 'changeduserkey',
+            confirmPassword: 'changeduserkey'
+          });
+
+        assert.equal(changePassword.body.result, 'password successfully changed!');
+      });
+    });
   });
   run()
 }, 2500);
