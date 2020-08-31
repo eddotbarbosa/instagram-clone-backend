@@ -30,3 +30,28 @@ exports.signOut = async function (req, res) {
     res.json({error: err});
   }
 };
+
+// change password
+exports.changePassword = async function (req, res) {
+  try {
+    const auth = req.auth;
+
+    const user = await userModel.findOne({_id: auth._id}).select('+password');
+    if (!user) return res.json({result: 'user does not exist!'});
+
+    if (!req.body.confirmPassword) return res.json({result: 'confirm the password!'});
+
+    if (req.body.newPassword !== req.body.confirmPassword) return res.json({result: 'password and confirm password do not match!'});
+
+    const comparePasswords = await bcrypt.compare(req.body.currentPassword, user.password);
+    if (!comparePasswords) return res.json({result: 'passwords do not match!'});
+
+    user.password = req.body.newPassword;
+
+    await user.save();
+
+    res.json({result: 'password successfully changed!'});
+  } catch (err) {
+    res.json({error: err});
+  }
+};

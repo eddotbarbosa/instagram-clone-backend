@@ -10,4 +10,7 @@ const router = express.Router();
 router.post('/signin', authController.signIn);
 router.post('/signout', authMiddleware.authentication, authController.signOut);
 
+// change password
+router.post('/change-password', authMiddleware.authentication, authController.changePassword);
+
 module.exports = router;
