@@ -13,4 +13,8 @@ router.post('/signout', authMiddleware.authentication, authController.signOut);
 // change password
 router.post('/change-password', authMiddleware.authentication, authController.changePassword);
 
+// email verification
+router.post('/send-email-verification', authMiddleware.authentication, authController.sendEmailVerification);
+router.post('/email-verification', authController.emailVerification);
+
 module.exports = router;

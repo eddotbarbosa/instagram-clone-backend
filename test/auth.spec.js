@@ -78,6 +78,16 @@ setTimeout(function () {
         assert.equal(changePassword.body.result, 'password successfully changed!');
       });
     });
+
+    describe('email verification', () => {
+      it('should send a email verification when all fields are corrects', async () =>{
+        const emailVerification = await request(server)
+          .post('/auth/send-email-verification')
+          .set('Authorization', token);
+
+        assert.equal(emailVerification.body.result, 'email verification successfully sended!');
+      });
+    });
   });
   run()
 }, 2500);
