@@ -17,4 +17,8 @@ router.post('/change-password', authMiddleware.authentication, authController.ch
 router.post('/send-email-verification', authMiddleware.authentication, authController.sendEmailVerification);
 router.post('/email-verification', authController.emailVerification);
 
+// reset password
+router.post('/send-reset-password', authController.sendResetPassword);
+router.post('/reset-password', authController.resetPassword);
+
 module.exports = router;

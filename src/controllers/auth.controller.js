@@ -135,3 +135,58 @@ exports.emailVerification = async function (req, res) {
     res.json({error: err});
   }
 };
+
+// reset password
+exports.sendResetPassword = async function (req, res) {
+  try {
+    const user = await userModel.findOne({email: req.body.email});
+    if (!user) return res.json({result: 'user does not exist!'});
+
+    const token = crypto.randomBytes(20).toString('hex');
+
+    const tokenExpiresAt = new Date();
+    tokenExpiresAt.setHours(tokenExpiresAt.getHours() + 1);
+
+    const mail = {
+      from: 'isntagramClone@email.com',
+      to: user.email,
+      subject: 'Instagram Clone Reset Password',
+      template: 'resetPassword',
+      context: {
+        username: user.name,
+        token: token,
+        tokenExpiresAt: tokenExpiresAt
+      }
+    };
+
+    await transporter.sendMail(mail);
+
+    user.resetPasswordToken.token = token;
+    user.resetPasswordToken.expiresAt = tokenExpiresAt;
+
+    await user.save();
+
+    res.json({result: 'reset password successfully sended!'});
+  } catch (err) {
+    res.json({error: err});
+  }
+};
+
+exports.resetPassword = async function (req, res) {
+  try {
+    const user = await userModel.findOne({'resetPasswordToken.token': req.body.token});
+    if (!user) return res.json({result: 'invalid token!'});
+
+    if (req.body.password !== req.body.confirmPassword) return res.json({result: 'password and confirm password do not match!'});
+
+    user.resetPasswordToken.token = undefined;
+    user.resetPasswordToken.expiresAt = undefined;
+    user.password = req.body.password;
+
+    user.save();
+
+    res.json({result: 'password successfully reseted!'});
+  } catch (err) {
+    res.json({error: err});
+  }
+};

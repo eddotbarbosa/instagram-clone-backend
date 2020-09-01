@@ -88,6 +88,18 @@ setTimeout(function () {
         assert.equal(emailVerification.body.result, 'email verification successfully sended!');
       });
     });
+
+    describe('reset password', () => {
+      it('should send a reset password when all fields are corrects', async () => {
+        const resetPassword = await request(server)
+          .post('/auth/send-reset-password')
+          .send({
+            email: 'authuser@email.com'
+          });
+
+        assert.equal(resetPassword.body.result, 'reset password successfully sended!');
+      });
+    });
   });
   run()
 }, 2500);
