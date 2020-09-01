@@ -16,6 +16,11 @@ const userSchema = new Schema({
   posts: [{type: Schema.Types.ObjectId, ref: 'Post'}],
   followers: [{type: Schema.Types.ObjectId, ref: 'User'}],
   following: [{type: Schema.Types.ObjectId, ref: 'User'}],
+  emailVerificationToken: {
+    token: {type: String},
+    expiresAt: {type: Date}
+  },
+  isVerified: {type: Boolean, default: false},
   createdAt: {type: Date, default: Date.now}
 });
 
