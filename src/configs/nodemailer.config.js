@@ -7,4 +7,4 @@ exports.transporter = {
     user: "",
     pass: ""
   }
-}
+};
