@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const userRoutes = require('./routes/user.routes.js');
 const authRoutes = require('./routes/auth.routes.js');
+const postRoutes = require('./routes/post.routes.js');
 
 const app = express();
 
@@ -18,6 +19,10 @@ mongoose.connect(process.env.DB_URI, {useCreateIndex: true, useNewUrlParser: tru
     console.log(err);
   });
 
+// static files
+app.use(express.static('public'));
+app.use(express.static(process.cwd() + '/src/tmp/uploads'));
+
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({extended: false}));
 
@@ -27,6 +32,7 @@ app.use(bodyParser.json());
 // routes
 app.use('/users', userRoutes);
 app.use('/auth', authRoutes);
+app.use('/posts', postRoutes);
 
 app.listen(port, () => {
   console.log('app listening on port ' + port);

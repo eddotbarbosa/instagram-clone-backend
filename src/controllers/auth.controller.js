@@ -179,6 +179,9 @@ exports.resetPassword = async function (req, res) {
 
     if (req.body.password !== req.body.confirmPassword) return res.json({result: 'password and confirm password do not match!'});
 
+    const currentDate = new Date();
+    if (currentDate > user.resetPasswordToken.expiresAt) return res.json({result: 'token has expired!'});
+
     user.resetPasswordToken.token = undefined;
     user.resetPasswordToken.expiresAt = undefined;
     user.password = req.body.password;
