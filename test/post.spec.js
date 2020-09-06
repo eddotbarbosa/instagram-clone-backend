@@ -88,5 +88,50 @@ setTimeout(function () {
         assert.equal(post.body.result, 'post successfully deleted!');
       });
     });
+
+    describe('like tests', () => {
+      let postId;
+
+      before(async () => {
+        const post = await request(server)
+          .post('/posts')
+          .set('Authorization', token)
+          .attach('picture', process.cwd() + '/public/images/default-avatar.png')
+          .field('description', 'testpost');
+
+        postId = post.body._id;
+      });
+
+      after(async () => {
+        await request(server)
+          .del('/posts')
+          .set('Authorization', token)
+          .send({
+            post: postId
+          });
+      });
+
+      it('should like a post when all fields are corrects', async () => {
+        const post = await request(server)
+          .post('/posts/like')
+          .set('Authorization', token)
+          .send({
+            post: postId
+          });
+
+        assert.equal(post.body.result, 'like successfully added on post!');
+      });
+
+      it('should dislike a post when all fields are corrects', async () => {
+        const post = await request(server)
+          .post('/posts/like')
+          .set('Authorization', token)
+          .send({
+            post: postId
+          });
+
+        assert.equal(post.body.result, 'dislike successfully added on post!');
+      });
+    });
   });
 }, 2500);
