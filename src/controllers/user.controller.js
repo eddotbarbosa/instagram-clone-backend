@@ -76,3 +76,62 @@ exports.deleteUser = async function (req, res) {
     res.json({error: err});
   }
 };
+
+// followers and following
+exports.followUser = async function (req, res) {
+  try {
+    const auth = req.auth;
+
+    const user =  await userModel.findOne({username: req.body.username});
+    if (!user) return res.json({result: 'user does not exist!'});
+    if (user._id.toString() === auth._id) return res.json({result: 'you cannot follow yourself!'});
+
+    await userModel.updateOne({_id: auth._id}, {$addToSet: {following: user._id}});
+    await userModel.updateOne({_id: user._id}, {$addToSet: {followers: auth._id}});
+
+    res.json({result: 'user successfully followed!'});
+  } catch (err) {
+    res.json({error: err});
+  }
+};
+
+exports.unfollowUser = async function (req, res) {
+  try {
+    const auth = req.auth;
+
+    const user =  await userModel.findOne({username: req.body.username});
+    if (!user) return res.json({result: 'user does not exist!'});
+    if (user._id.toString() === auth._id) return res.json({result: 'you cannot unfollow yourself!'});
+
+    await userModel.updateOne({_id: auth._id}, {$pull: {following: user._id}});
+    await userModel.updateOne({_id: user._id}, {$pull: {followers: auth._id}});
+
+    res.json({result: 'user successfully unfollowed!'});
+  } catch (err) {
+    res.json({error: err});
+  }
+};
+
+exports.readFollowers = async function (req, res) {
+  try {
+    const user = await userModel.findOne({username: req.params.username})
+      .select('followers')
+      .populate({path: 'followers', select: 'username avatar'});
+
+    res.json(user);
+  } catch (err) {
+    res.json({error: err});
+  }
+};
+
+exports.readFollowing = async function (req, res) {
+  try {
+    const user = await userModel.findOne({username: req.params.username})
+      .select('following')
+      .populate({path: 'following', select: 'username avatar'});
+
+    res.json(user);
+  } catch (err) {
+    res.json({error: err});
+  }
+};
