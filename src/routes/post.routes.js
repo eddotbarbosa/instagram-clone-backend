@@ -16,4 +16,7 @@ router.get('/:post', postController.readPost);
 router.put('/', authMiddleware.authentication, postController.updatePost);
 router.delete('/', authMiddleware.authentication, postController.deletePost);
 
+// like
+router.post('/like', authMiddleware.authentication, postController.likePost);
+
 module.exports = router;

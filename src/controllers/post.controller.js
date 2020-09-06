@@ -86,3 +86,28 @@ exports.deletePost = async function (req, res) {
     res.json({error: err});
   }
 };
+
+// like
+exports.likePost = async function (req, res) {
+  try {
+    const auth = req.auth;
+
+    const post = await postModel.findOne({_id: req.body.post});
+
+    if (!post.likes.includes(auth._id)) {
+      post.likes.addToSet(auth._id);
+
+      await post.save();
+
+      return res.json({result: 'like successfully added on post!'});
+    } else {
+      post.likes.pull(auth._id);
+
+      await post.save();
+
+      return res.json({result: 'dislike successfully added on post!'});
+    }
+  } catch (err) {
+    res.json({error: err});
+  }
+};
