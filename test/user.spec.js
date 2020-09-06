@@ -61,6 +61,93 @@ setTimeout(function () {
         assert.equal(user.body.result, 'user successfully deleted!');
       });
     });
+
+    describe('followers tests', () => {
+      let fisrtUserToken, secondUserToken;
+
+      before(async () => {
+        await request(server)
+          .post('/users')
+          .send({
+            name: 'first user',
+            username: 'firstuser',
+            email: 'firstuser@email.com',
+            password: 'firstuserkey'
+          });
+
+        await request(server)
+          .post('/users')
+          .send({
+            name: 'second user',
+            username: 'seconduser',
+            email: 'seconduser@email.com',
+            password: 'seconduserkey'
+          });
+
+        const firstUser = await request(server)
+          .post('/auth/signin')
+          .send({
+            email: 'firstuser@email.com',
+            password: 'firstuserkey'
+          });
+
+        const secondUser = await request(server)
+          .post('/auth/signin')
+          .send({
+            email: 'seconduser@email.com',
+            password: 'seconduserkey'
+          });
+
+        fisrtUserToken = firstUser.body.token;
+        secondUserToken = secondUser.body.token;
+      });
+
+      after(async () => {
+        await request(server)
+          .del('/users')
+          .set('Authorization', fisrtUserToken);
+
+        await request(server)
+          .del('/users')
+          .set('Authorization', secondUserToken);
+      });
+
+      it('should follow a user when all fields are corrects', async () => {
+        const user = await request(server)
+          .post('/users/follow')
+          .set('Authorization', fisrtUserToken)
+          .send({
+            username: 'seconduser'
+          });
+
+        assert.equal(user.body.result, 'user successfully followed!');
+      });
+
+      it('should unfollow a user when all fields are corrects', async () => {
+        const user = await request(server)
+          .post('/users/unfollow')
+          .set('Authorization', fisrtUserToken)
+          .send({
+            username: 'seconduser'
+          });
+
+        assert.equal(user.body.result, 'user successfully unfollowed!');
+      });
+
+      it('should read followers when all fields are corrects', async () => {
+        const user = await request(server)
+          .get('/users/seconduser/followers');
+
+        assert.exists(user.body.followers);
+      });
+
+      it('should read following when all fields are corrects', async () => {
+        const user = await request(server)
+          .get('/users/firstuser/following');
+
+        assert.exists(user.body.following);
+      });
+    });
   });
   run();
 }, 2500);
