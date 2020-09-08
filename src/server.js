@@ -6,6 +6,7 @@ require('dotenv').config();
 const userRoutes = require('./routes/user.routes.js');
 const authRoutes = require('./routes/auth.routes.js');
 const postRoutes = require('./routes/post.routes.js');
+const commentRoutes = require('./routes/comment.routes.js');
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use(bodyParser.json());
 app.use('/users', userRoutes);
 app.use('/auth', authRoutes);
 app.use('/posts', postRoutes);
+app.use('/comments', commentRoutes);
 
 app.listen(port, () => {
   console.log('app listening on port ' + port);
