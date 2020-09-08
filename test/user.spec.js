@@ -1,5 +1,6 @@
 const chai = require('chai');
 const request = require('supertest');
+const fs = require('fs');
 
 const server = require('../src/server.js');
 
@@ -146,6 +147,50 @@ setTimeout(function () {
           .get('/users/firstuser/following');
 
         assert.exists(user.body.following);
+      });
+    });
+
+    describe('avatar tests', () => {
+      let token;
+
+      before(async () => {
+        await request(server)
+          .post('/users')
+          .send({
+            name: 'avatar user',
+            username: 'avataruser',
+            email: 'avataruser@email.com',
+            password: 'avataruserkey'
+          });
+
+        const signIn = await request(server)
+          .post('/auth/signin')
+          .send({
+            email: 'avataruser@email.com',
+            password: 'avataruserkey'
+          });
+
+        token = signIn.body.token;
+      });
+
+      after(async () => {
+        const user = await request(server)
+          .get('/users/avataruser');
+
+        fs.unlinkSync(process.cwd() + '/src/tmp/uploads' + user.body.avatar);
+
+        await request(server)
+          .del('/users')
+          .set('Authorization', token);
+      });
+
+      it('should change avatar when all fields match', async () => {
+        const user = await request(server)
+          .put('/users/change-avatar')
+          .set('Authorization', token)
+          .attach('picture', process.cwd() + '/public/images/default-avatar.png');
+
+        assert.equal(user.body.result, 'avatar successfully updated!');
       });
     });
   });

@@ -1,8 +1,12 @@
 const express = require('express');
+const multer = require('multer');
 
 const userController = require('../controllers/user.controller.js');
 
 const authMiddleware = require('../middlewares/auth.middleware.js');
+const sharpMiddleware = require('../middlewares/sharp.middleware.js');
+
+const multerConfig = require('../configs/multer.config.js');
 
 const router = express.Router();
 
@@ -18,6 +22,9 @@ router.post('/unfollow', authMiddleware.authentication, userController.unfollowU
 
 router.get('/:username/followers', userController.readFollowers);
 router.get('/:username/following', userController.readFollowing);
+
+// change avatar
+router.put('/change-avatar', authMiddleware.authentication, multer(multerConfig.picture).single('picture'), sharpMiddleware.resize, userController.changeAvatar);
 
 module.exports = router;
 
