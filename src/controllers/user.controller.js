@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 const userModel = require('../models/user.model.js');
 
 // user CRUD
@@ -131,6 +133,44 @@ exports.readFollowing = async function (req, res) {
       .populate({path: 'following', select: 'username avatar'});
 
     res.json(user);
+  } catch (err) {
+    res.json({error: err});
+  }
+};
+
+// change avatar
+exports.changeAvatar = async function (req, res) {
+  try {
+    const auth = req.auth;
+
+    const user = await userModel.findOne({_id: auth._id});
+    if (!user) return res.json({result: 'user does not exist!'});
+
+    if (user.avatar == '/images/default-avatar.png') {
+      user.avatar = '/images/rs-' + req.file.filename;
+
+      await user.save();
+
+      return res.json({result: 'avatar successfully updated!'});
+    }
+
+    if (!fs.existsSync(process.cwd() + '/src/tmp/uploads/' + user.avatar)) {
+      fs.unlinkSync(process.cwd() + '/src/tmp/uploads/images/rs-' + req.file.filename);
+
+      user.avatar = '/images/default-avatar.png';
+
+      await user.save();
+
+      return res.json({result: 'an error has occurred and the avatar has been set to default please try again!'});
+    }
+
+    fs.unlinkSync(process.cwd() + '/src/tmp/uploads/' + user.avatar);
+
+    user.avatar = '/images/rs-' + req.file.filename;
+
+    await user.save();
+
+    res.json({result: 'avatar successfully updated!'});
   } catch (err) {
     res.json({error: err});
   }
