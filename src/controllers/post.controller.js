@@ -2,6 +2,7 @@ const fs = require('fs');
 
 const postModel = require('../models/post.model.js');
 const userModel = require('../models/user.model.js');
+const commentModel = require('../models/comment.model.js');
 
 // post CRUD
 exports.createPost = async function (req, res) {
@@ -33,7 +34,8 @@ exports.createPost = async function (req, res) {
 exports.readPost = async function (req, res) {
   try {
     const post = await postModel.findOne({_id: req.params.post})
-      .populate({path: 'author', select: 'username avatar'});
+      .populate({path: 'author', select: 'username avatar'})
+      .populate({path: 'comments', select: 'author comment', populate: {path: 'author', select: 'username avatar'}});
 
     if (!post) return res.json({result: 'post does not exist!'});
 
@@ -70,6 +72,8 @@ exports.deletePost = async function (req, res) {
     if (!post) return res.json({result: 'post does not exist!'});
 
     if (post.author.toString() !== auth._id) return res.json({result: 'you are not the author of this post!'});
+
+    if (post.comments) await commentModel.deleteMany({post: post._id});
 
     await postModel.deleteOne({_id: post._id});
 
