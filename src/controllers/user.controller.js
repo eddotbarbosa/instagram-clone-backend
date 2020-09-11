@@ -1,6 +1,7 @@
 const fs = require('fs');
 
 const userModel = require('../models/user.model.js');
+const postModel = require('../models/post.model.js');
 
 // user CRUD
 exports.createUser = async function (req, res) {
@@ -171,6 +172,40 @@ exports.changeAvatar = async function (req, res) {
     await user.save();
 
     res.json({result: 'avatar successfully updated!'});
+  } catch (err) {
+    res.json({error: err});
+  }
+};
+
+// feed
+exports.feed = async function (req, res) {
+  try {
+    const auth = req.auth;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+
+    if (page < 0 || limit < 0) return res.json({result: 'page or limit values cannot be negative!'});
+
+    const user = await userModel.findOne({_id: auth._id}).select('following');
+    if (!user) return res.json({result: 'user does not exist!'});
+
+    const feedCount = await postModel.countDocuments({author: [user._id, ...user.following]});
+
+    const paging = {
+      previous: (page === 1) ? 'no previous' : 'page=' + (page - 1) + '&limit=' + limit,
+      next: ((page * limit) >= feedCount) ? 'no next' : 'page=' + (page + 1) + '&limit=' + limit,
+      pages: Math.ceil(feedCount / limit)
+    };
+
+    const feed = await postModel.find({author: [user._id, ...user.following]})
+      .populate({path: 'author', select: 'username avatar'})
+      .populate({path: 'comments', populate: {path: 'author', select: 'username avatar'}})
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .sort('-createdAt');
+
+    res.json({paging: paging, result: feed});
   } catch (err) {
     res.json({error: err});
   }

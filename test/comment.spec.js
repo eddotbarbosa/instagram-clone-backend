@@ -53,7 +53,7 @@ setTimeout(function () {
     describe('comment CRUD', () => {
       let commentId;
 
-      it('should create a comment when all fields match', async () => {
+      it('should create a comment when all fields are corrects', async () => {
         const comment = await request(server)
           .post('/comments')
           .set('Authorization', token)
@@ -67,14 +67,14 @@ setTimeout(function () {
         assert.equal(comment.body.comment, 'test comment');
       });
 
-      it('should read a comment when all fields match', async () => {
+      it('should read a comment when all fields are corrects', async () => {
         const comment = await request(server)
           .get('/comments/' + commentId);
 
         assert.equal(comment.body.comment, 'test comment');
       });
 
-      it('should update a comment when all fields match', async () => {
+      it('should update a comment when all fields are corrects', async () => {
         const comment = await request(server)
           .put('/comments')
           .set('Authorization', token)
@@ -86,7 +86,7 @@ setTimeout(function () {
         assert.equal(comment.body.comment, 'updated comment');
       });
 
-      it('should delete a comment when all fields match', async () => {
+      it('should delete a comment when all fields are corrects', async () => {
         const comment = await request(server)
          .del('/comments')
          .set('Authorization', token)
