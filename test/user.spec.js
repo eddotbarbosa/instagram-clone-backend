@@ -184,13 +184,51 @@ setTimeout(function () {
           .set('Authorization', token);
       });
 
-      it('should change avatar when all fields match', async () => {
+      it('should change avatar when all fields are corrects', async () => {
         const user = await request(server)
           .put('/users/change-avatar')
           .set('Authorization', token)
           .attach('picture', process.cwd() + '/public/images/default-avatar.png');
 
         assert.equal(user.body.result, 'avatar successfully updated!');
+      });
+    });
+
+    describe('feed tests', () => {
+      let token;
+
+      before(async () => {
+        await request(server)
+          .post('/users')
+          .send({
+            name: 'feed user',
+            username: 'feeduser',
+            email: 'feeduser@email.com',
+            password: 'feeduserkey'
+          });
+
+        const signIn = await request(server)
+          .post('/auth/signin')
+          .send({
+            email: 'feeduser@email.com',
+            password: 'feeduserkey'
+          });
+
+        token = signIn.body.token;
+      });
+
+      after(async () => {
+        await request(server)
+          .del('/users')
+          .set('Authorization', token);
+      });
+
+      it('should return user feed when all fields are corrects', async () => {
+        const feed = await request(server)
+          .get('/users/feed')
+          .set('Authorization', token);
+
+        assert.equal(feed.body.paging.pages, 0);
       });
     });
   });

@@ -10,6 +10,9 @@ const multerConfig = require('../configs/multer.config.js');
 
 const router = express.Router();
 
+// feed
+router.get('/feed', authMiddleware.authentication, userController.feed);
+
 // user CRUD
 router.post('/', userController.createUser);
 router.get('/:username', userController.readUser);
