@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const cors = require('cors');
 require('dotenv').config();
 
 const userRoutes = require('./routes/user.routes.js');
@@ -11,6 +12,9 @@ const commentRoutes = require('./routes/comment.routes.js');
 const app = express();
 
 const port = process.env.PORT || 5000;
+
+// cors
+app.use(cors());
 
 // database connection
 mongoose.connect(process.env.DB_URI, {useCreateIndex: true, useNewUrlParser: true, useUnifiedTopology: true})

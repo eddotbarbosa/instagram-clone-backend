@@ -100,6 +100,16 @@ setTimeout(function () {
         assert.equal(resetPassword.body.result, 'reset password successfully sended!');
       });
     });
+
+    describe('me', () => {
+      it('should return some user infos when all fields are corrects', async () => {
+        const user = await request(server)
+          .get('/auth/me')
+          .set('Authorization', token);
+
+        assert.equal(user.body.status, 'connected');
+      });
+    });
   });
   run()
 }, 2500);
