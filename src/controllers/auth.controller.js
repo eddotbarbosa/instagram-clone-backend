@@ -199,7 +199,7 @@ exports.me = async function (req, res) {
   try {
     const auth = req.auth;
 
-    const user = await userModel.findOne({_id: auth._id}).select('username');
+    const user = await userModel.findOne({_id: auth._id}).select('username avatar');
     if (!user) return res.json({result: 'user does not exist!'});
 
     res.json({status: 'connected', user: user});
