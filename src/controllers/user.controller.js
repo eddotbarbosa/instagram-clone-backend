@@ -31,8 +31,7 @@ exports.createUser = async function (req, res) {
 
 exports.readUser = async function (req, res) {
   try {
-    const user = await userModel.findOne({username: req.params.username})
-      .populate({path: 'posts'});
+    const user = await userModel.findOne({username: req.params.username});
 
     if (!user) return res.json({result: 'user does not exist!'});
 
