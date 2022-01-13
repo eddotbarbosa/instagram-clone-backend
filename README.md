@@ -2,6 +2,9 @@
 
 A REST API that replicates some Instagram features.
 
+## Related Repositories
+[Instagram Clone Frontend](https://github.com/eddotbarbosa/instagram-clone-frontend)
+
 ## Table of contents
 * [Features](#Features)
 * [Technologies](#technologies)
